@@ -1,0 +1,78 @@
+# =============== #
+# Backup #
+# =============== #
+[Aa]ssets[Bb]ackup
+
+# =============== #
+# Unity generated #
+# =============== #
+UnityGenerated/
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Pp]roject[Ss]ettings/
+[Pp]ackages/
+
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ExportedObj/
+*.svds
+*.suo
+*.user
+*.booproj
+
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+.gradle/
+.idea/
+.consulo/
+.vs
+.vscode
+
+
+# Ignore the following file extensions
+*.DS_Store
+*.s
+
+*.csproj
+*.unityproj
+ios-dev
+us_ios
+*.apk
+Assembly-CSharp-Editor-vs.csproj
+Assembly-CSharp-Editor.csproj
+Assembly-CSharp-firstpass-vs.csproj
+Assembly-CSharp-firstpass.csproj
+Assembly-CSharp-vs.csproj
+Assembly-CSharp.csproj
+Assembly-UnityScript-Editor-vs.unityproj
+Assembly-UnityScript-Editor.unityproj
+Assembly-UnityScript-firstpass-vs.unityproj
+Assembly-UnityScript-firstpass.unityproj
+Assembly-UnityScript-vs.unityproj
+Assembly-UnityScript.unityproj
+*.sln
+*.iml
+*.userprefs
+devBuild
+iosBuild
+Assets/Logs
+Logs.meta
+Bundles
+.consulo
+Logs
+webGL
+*.pyc
+Documents
