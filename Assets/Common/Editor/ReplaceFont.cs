@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using Utils.Debugger;
 using Editors;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -30,20 +31,23 @@ namespace Plugins
 
             var textComponents = Resources.FindObjectsOfTypeAll<Text>();
 
+            Undo.SetCurrentGroupName("Replace all legacy text fonts");
+
             foreach (var component in textComponents)
             {
                 if (component.gameObject.scene != currentScene) return;
 
+                Undo.RecordObject(component, "");
                 component.font = font;
                 if (components == null) components = new();
                 components.Add(component);
-                Debug.Log($"Replaced: {component.name}", component);
+                Console.Log($"Replaced: {component.name}", component, DColor.white);
             }
 
-            if (components != null)
-                EditorUtility.DisplayDialog("Replace font Result", "Successfuly replaced font on current scene", "Ok");
-            else
-                EditorUtility.DisplayDialog("Replace font Result", "Can't find any text components on current scene", "Ok");
+            if (components == null)
+                Console.LogError("Can't find any text components on current scene", DColor.red);
+
+            Undo.IncrementCurrentGroup();
         }
 
         public static void ReplaceFontInScene(TMP_FontAsset font)
@@ -57,22 +61,25 @@ namespace Plugins
             List<Component> components = null;
             var currentScene = EditorSceneManager.GetActiveScene();
 
+
             var textComponents = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
+            Undo.SetCurrentGroupName("Replace all TMP fonts");
 
             foreach (var component in textComponents)
             {
                 if (component.gameObject.scene != currentScene) return;
+                Undo.RecordObject(component, "");
 
                 component.font = font;
                 if (components == null) components = new();
                 components.Add(component);
-                Debug.Log($"Replaced: {component.name}", component);
+                Console.Log($"Replaced: {component.name}", component, DColor.white);
             }
 
-            if (components != null)
-                EditorUtility.DisplayDialog("Replace font Result", "Successfuly replaced font on current scene", "Ok");
-            else
-                EditorUtility.DisplayDialog("Replace font Result", "Can't find any text components on current scene", "Ok");
+            if (components == null)
+                Console.LogError("Can't find any TMP components on current scene", DColor.red);
+
+            Undo.IncrementCurrentGroup();
         }
 
         public static void ReplaceFontPrefab(Font font)
@@ -88,6 +95,7 @@ namespace Plugins
 
             List<Component> components = null;
 
+            Undo.SetCurrentGroupName("Replace all legacy text fonts");
             foreach (string path in prefabsPaths)
             {
                 if (path.Contains("Packages")) continue;
@@ -99,18 +107,19 @@ namespace Plugins
                     var prefabTexts = prefab.GetComponentsInChildren<Text>(true);
                     foreach (Text component in prefabTexts)
                     {
+                        Undo.RecordObject(component, "");
                         component.font = font;
                         if (components == null) components = new();
                         components.Add(component);
                     }
-                    Debug.Log($"Replaced: {prefab.name}", prefab);
+                    Console.Log($"Replaced: {prefab.name}", prefab, DColor.white);
                 }
             }
 
-            if (components != null)
-                EditorUtility.DisplayDialog("Replace font Result", "Successfuly replaced font in project", "Ok");
-            else
-                EditorUtility.DisplayDialog("Replace font Result", "Can't find any text components", "Ok");
+            if (components == null)
+                Console.LogError("Can't find any text components in prefabs", DColor.red);
+
+            Undo.IncrementCurrentGroup();
         }
 
         public static void ReplaceFontPrefab(TMP_FontAsset font)
@@ -125,6 +134,7 @@ namespace Plugins
                 Where(path => path.EndsWith(".prefab", System.StringComparison.OrdinalIgnoreCase)).ToArray();
 
             List<Component> components = null;
+            Undo.SetCurrentGroupName("Replace all TMP fonts");
 
             foreach (string path in prefabsPaths)
             {
@@ -137,18 +147,71 @@ namespace Plugins
                     var prefabTexts = prefab.GetComponentsInChildren<TextMeshProUGUI>(true);
                     foreach (TextMeshProUGUI component in prefabTexts)
                     {
+                        Undo.RecordObject(component, "");
                         component.font = font;
                         if (components == null) components = new();
                         components.Add(component);
                     }
-                    Debug.Log($"Replaced: {prefab.name}", prefab);
+                    Console.Log($"Replaced: {prefab.name}", prefab, DColor.white);
                 }
             }
 
-            if (components != null)
-                EditorUtility.DisplayDialog("Replace font Result", "Successfuly replaced font in project", "Ok");
-            else
-                EditorUtility.DisplayDialog("Replace font Result", "Can't find any text components", "Ok");
+            if (components == null)
+                Console.LogError("Can't find any TMP components in prefabs", DColor.red);
+
+            Undo.IncrementCurrentGroup();
+        }
+
+        public static void ReplaceFontSpecified(TMP_FontAsset font, List<TextMeshProUGUI> components)
+        {
+            if (font == null)
+            {
+                EditorUtility.DisplayDialog("Replace font Result", "Font is null", "Ok");
+                return;
+            }
+
+            if (components.Count == 0)
+            {
+                EditorUtility.DisplayDialog("Replace font Result", "Components List is null", "Ok");
+                return;
+            }
+
+            Undo.SetCurrentGroupName("Replace specified TMP fonts");
+
+            foreach (TextMeshProUGUI component in components)
+            {
+                Undo.RecordObject(component, "");
+                component.font = font;
+                Console.Log($"Replaced: {component.gameObject.name}", component, DColor.white);
+            }
+
+            Undo.IncrementCurrentGroup();
+        }
+
+        public static void ReplaceFontSpecified(Font font, List<Text> components)
+        {
+            if (font == null)
+            {
+                EditorUtility.DisplayDialog("Replace font Result", "Font is null", "Ok");
+                return;
+            }
+
+            if (components.Count == 0)
+            {
+                EditorUtility.DisplayDialog("Replace font Result", "Components List is null", "Ok");
+                return;
+            }
+
+            Undo.SetCurrentGroupName("Replace specified legacy text fonts");
+
+            foreach (Text component in components)
+            {
+                Undo.RecordObject(component, "");
+                component.font = font;
+                Console.Log($"Replaced: {component.gameObject.name}", component, DColor.white);
+            }
+
+            Undo.IncrementCurrentGroup();
         }
 
         public static void ReplaceFontInProject(Font font)
@@ -166,6 +229,7 @@ namespace Plugins
 
             List<Component> components = null;
 
+            Undo.SetCurrentGroupName("Replace all legacy text fonts");
             foreach (string path in prefabsPaths)
             {
                 if (path.Contains("Packages")) continue;
@@ -177,11 +241,12 @@ namespace Plugins
                     var prefabTexts = prefab.GetComponentsInChildren<Text>(true);
                     foreach (Text component in prefabTexts)
                     {
+                        Undo.RecordObject(component, "");
                         component.font = font;
                         if (components == null) components = new();
                         components.Add(component);
                     }
-                    Debug.Log($"Replaced: {prefab.name}", prefab);
+                    Console.Log($"Replaced: {prefab.name}", prefab, DColor.white);
                 }
             }
 
@@ -195,10 +260,11 @@ namespace Plugins
                 EditorSceneManager.OpenScene(scene);
                 foreach (var component in textComponents)
                 {
+                    Undo.RecordObject(component, "");
                     component.font = font;
                     if (components == null) components = new();
                     components.Add(component);
-                    Debug.Log($"Replaced: {component.name}", component);
+                    Console.Log($"Replaced: {component.name}", component, DColor.white);
                 }
 
                 EditorSceneManager.SaveOpenScenes();
@@ -206,10 +272,9 @@ namespace Plugins
 
             EditorSceneManager.OpenScene(currentScene);
 
-            if (components != null)
-                EditorUtility.DisplayDialog("Replace font Result", "Successfuly replaced font in project", "Ok");
-            else
-                EditorUtility.DisplayDialog("Replace font Result", "Can't find any text components", "Ok");
+            if (components == null)
+                Console.LogError("Can't find any text components on all scenes", DColor.red);
+            Undo.IncrementCurrentGroup();
         }
 
         public static void ReplaceFontInProject(TMP_FontAsset font)
@@ -227,6 +292,7 @@ namespace Plugins
 
             List<Component> components = null;
 
+            Undo.SetCurrentGroupName("Replace all TMP fonts");
             foreach (string path in prefabsPaths)
             {
                 if (path.Contains("Packages")) continue;
@@ -242,7 +308,7 @@ namespace Plugins
                         if (components == null) components = new();
                         components.Add(component);
                     }
-                    Debug.Log($"Replaced: {prefab.name}", prefab);
+                    Console.Log($"Replaced: {prefab.name}", prefab, DColor.white);
                 }
             }
 
@@ -260,7 +326,7 @@ namespace Plugins
                     component.font = font;
                     if (components == null) components = new();
                     components.Add(component);
-                    Debug.Log($"Replaced: {component.name}");
+                    Console.Log($"Replaced: {component.name}", component, DColor.white);
                 }
 
                 EditorSceneManager.SaveOpenScenes();
@@ -268,10 +334,9 @@ namespace Plugins
 
             EditorSceneManager.OpenScene(currentScene);
 
-            if (components != null)
-                EditorUtility.DisplayDialog("Replace font Result", "Successfuly replaced font in project", "Ok");
-            else
-                EditorUtility.DisplayDialog("Replace font Result", "Can't find any text components", "Ok");
+            if (components == null)
+                Console.LogError("Can't find any TMP components on all scenes", DColor.red);
+            Undo.IncrementCurrentGroup();
         }
     }
 }

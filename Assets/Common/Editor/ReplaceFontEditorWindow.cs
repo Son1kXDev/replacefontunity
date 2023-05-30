@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEditor;
+using Utils.Debugger;
 using Plugins;
 using TMPro;
+using System.Collections.Generic;
 
 namespace Editors
 {
@@ -9,7 +11,8 @@ namespace Editors
     {
         private Font newFont;
         private TMP_FontAsset newTMPfont;
-
+        [SerializeField] private List<UnityEngine.UI.Text> specifiedLegacyTextObjects;
+        [SerializeField] private List<TextMeshProUGUI> specifiedTMPObjects;
         private WindowType windowType;
         private FontType fontType;
 
@@ -18,7 +21,7 @@ namespace Editors
             EditorWindow window = GetWindow(typeof(ReplaceFontEditorWindow));
             window.titleContent = new GUIContent("Replace font Tool");
 
-            window.maxSize = new Vector2(350, 90);
+            window.maxSize = new Vector2(350, 350);
             window.minSize = new Vector2(350, 90);
         }
 
@@ -26,18 +29,18 @@ namespace Editors
         {
             GUILayout.Space(10);
 
-            GUILayout.FlexibleSpace();
+            ScriptableObject target = this;
+            SerializedObject so = new SerializedObject(target);
+            SerializedProperty specifiedLegacyTextObjectsProperty = so.FindProperty(nameof(specifiedLegacyTextObjects));
+            SerializedProperty specifiedTMPObjectsProperty = so.FindProperty(nameof(specifiedTMPObjects));
 
-            switch (fontType)
-            {
-                case FontType.LegacyText:
-                    newFont = EditorGUILayout.ObjectField("New font", newFont, typeof(Font), false) as Font;
-                    break;
+            if (fontType == FontType.LegacyText)
+                newFont = EditorGUILayout.ObjectField("New font", newFont, typeof(Font), false) as Font;
+            else newTMPfont = EditorGUILayout.ObjectField("New font", newTMPfont, typeof(TMP_FontAsset), false) as TMP_FontAsset;
 
-                case FontType.TextMeshPro:
-                    newTMPfont = EditorGUILayout.ObjectField("New font", newTMPfont, typeof(TMP_FontAsset), false) as TMP_FontAsset;
-                    break;
-            }
+            if (windowType == WindowType.Specified)
+                EditorGUILayout
+                .PropertyField(fontType == FontType.LegacyText ? specifiedLegacyTextObjectsProperty : specifiedTMPObjectsProperty, true);
 
             windowType = (WindowType)EditorGUILayout.EnumPopup("Find place:", windowType);
 
@@ -48,51 +51,33 @@ namespace Editors
                 switch (windowType)
                 {
                     case WindowType.CurrentScene:
-                        switch (fontType)
-                        {
-                            case FontType.LegacyText:
-                                ReplaceFont.ReplaceFontInScene(newFont);
-                                break;
-
-                            case FontType.TextMeshPro:
-                                ReplaceFont.ReplaceFontInScene(newTMPfont);
-                                break;
-                        }
+                        if (fontType == FontType.LegacyText) ReplaceFont.ReplaceFontInScene(newFont);
+                        else ReplaceFont.ReplaceFontInScene(newTMPfont);
                         break;
 
                     case WindowType.Prefabs:
-                        switch (fontType)
-                        {
-                            case FontType.LegacyText:
-                                ReplaceFont.ReplaceFontPrefab(newFont);
-                                break;
-
-                            case FontType.TextMeshPro:
-                                ReplaceFont.ReplaceFontPrefab(newTMPfont);
-                                break;
-                        }
+                        if (fontType == FontType.LegacyText) ReplaceFont.ReplaceFontPrefab(newFont);
+                        else ReplaceFont.ReplaceFontPrefab(newTMPfont);
                         break;
 
                     case WindowType.InProject:
-                        switch (fontType)
-                        {
-                            case FontType.LegacyText:
-                                ReplaceFont.ReplaceFontInProject(newFont);
-                                break;
+                        if (fontType == FontType.LegacyText) ReplaceFont.ReplaceFontInProject(newFont);
+                        else ReplaceFont.ReplaceFontInProject(newTMPfont);
+                        break;
 
-                            case FontType.TextMeshPro:
-                                ReplaceFont.ReplaceFontInProject(newTMPfont);
-                                break;
-                        }
+                    case WindowType.Specified:
+                        if (fontType == FontType.LegacyText) ReplaceFont.ReplaceFontSpecified(newFont, specifiedLegacyTextObjects);
+                        else ReplaceFont.ReplaceFontSpecified(newTMPfont, specifiedTMPObjects);
                         break;
                 }
             }
             GUILayout.Space(10);
+            so.ApplyModifiedProperties();
         }
     }
 
     public enum WindowType
-    {[InspectorName("Current scene")] CurrentScene, Prefabs, [InspectorName("All files in project")] InProject }
+    { [InspectorName("Current scene")] CurrentScene, Prefabs, Specified, [InspectorName("All files in project")] InProject }
 
     public enum FontType
     { LegacyText, TextMeshPro }
