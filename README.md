@@ -16,8 +16,10 @@ This method replaces the font in specific Text or TextMeshProUGUI components.
 
 To use this method, go to `Tools > Project > Replace Font` in the Unity Editor. A window will appear, allowing you to select the font you want to use. First select the font type on `Type` enum. Next select the font you want to use. Click on `Find place` enum and select `Specified`. Add all components where you need to replace the font to `Specified Objects` list. Click the `Replace` button.
 
-![image](https://github.com/Son1kXDev/replacefontunity/assets/106654105/0df54a40-0ccf-4db1-8f90-4534d688c3e2)
-![image](https://github.com/Son1kXDev/replacefontunity/assets/106654105/11e94b46-8b97-4ffb-8929-f7c6c2170a4f)
+![image](https://github.com/Son1kXDev/replacefontunity/assets/106654105/d9a2baba-2232-49aa-9679-4481bbe1c415)
+![image](https://github.com/Son1kXDev/replacefontunity/assets/106654105/69f934bc-9b00-4e1d-b9d0-76fd38dbf98c)
+
+After all process you can click the `Clear` button to remove all items from `Specified Objects` list.
 
 ### Replace Font in Scene
 
