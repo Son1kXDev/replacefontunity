@@ -35,7 +35,7 @@ namespace Plugins
             foreach (var component in textComponents)
             {
                 if (component.gameObject.scene != currentScene)
-                    return;
+                    continue;
 
                 Undo.RecordObject(component, "");
                 component.font = font;
@@ -68,7 +68,9 @@ namespace Plugins
             foreach (var component in textComponents)
             {
                 if (component.gameObject.scene != currentScene)
-                    return;
+                    continue;
+
+
                 Undo.RecordObject(component, "");
 
                 component.font = font;
@@ -191,21 +193,26 @@ namespace Plugins
 
             Undo.SetCurrentGroupName("Replace specified TMP fonts");
 
+            bool oneComponentIsEmpty = false;
+
             foreach (TextMeshProUGUI component in components)
             {
                 if (component == null)
                 {
-                    EditorUtility.DisplayDialog(
-                        "Replace font Result",
-                        "One of the components of the list is null",
-                        "Ok"
-                    );
-                    return;
+                    oneComponentIsEmpty = true;
+                    continue;
                 }
                 Undo.RecordObject(component, "");
                 component.font = font;
                 Debug.Log($"Replaced: {component.gameObject.name}", component);
             }
+
+            if (oneComponentIsEmpty)
+                EditorUtility.DisplayDialog(
+                        "Replace font Result",
+                        "One of the components of the list is empty. Please manually check the list of text objects you have set. All other components have been replaced successfully.",
+                        "Ok"
+                    );
 
             Undo.IncrementCurrentGroup();
         }
@@ -226,21 +233,26 @@ namespace Plugins
 
             Undo.SetCurrentGroupName("Replace specified legacy text fonts");
 
+            bool oneComponentIsEmpty = false;
+
             foreach (Text component in components)
             {
                 if (component == null)
                 {
-                    EditorUtility.DisplayDialog(
-                        "Replace font Result",
-                        "One of the components of the list is null",
-                        "Ok"
-                    );
-                    return;
+                    oneComponentIsEmpty = true;
+                    continue;
                 }
                 Undo.RecordObject(component, "");
                 component.font = font;
                 Debug.Log($"Replaced: {component.gameObject.name}", component);
             }
+
+            if (oneComponentIsEmpty)
+                EditorUtility.DisplayDialog(
+                        "Replace font Result",
+                        "One of the components of the list is empty. Please manually check the list of text objects you have set. All other components have been replaced successfully.",
+                        "Ok"
+                    );
 
             Undo.IncrementCurrentGroup();
         }
